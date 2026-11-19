@@ -1,0 +1,44 @@
+CREATE TABLE IF NOT EXISTS clientes (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    cpf_cnpj VARCHAR(20) NOT NULL
+);
+
+-- 2. Tabela de Pedidos / Faturas que geram a cobrança
+CREATE TABLE IF NOT EXISTS pedidos (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    valor_total DECIMAL(12,2) NOT NULL,
+    status_pedido VARCHAR(30) DEFAULT 'PENDENTE', -- PENDENTE, PAGO, CANCELADO
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+);
+
+-- 3. Tabela Central de Pagamentos e Transações
+CREATE TABLE IF NOT EXISTS transacoes_pagamento (
+    id SERIAL PRIMARY KEY,
+    pedido_id INT NOT NULL,
+    -- 'CARTAO_CREDITO', 'BOLETO', 'PAYPAL', 'PAGSEGURO'
+    gateway_metodo VARCHAR(30) NOT NULL, 
+    status_pagamento VARCHAR(30) NOT NULL, -- PENDENTE, APROVADO, RECUSADO, ESTORNADO
+    valor_pago DECIMAL(12,2) NOT NULL,
+    taxa_gateway DECIMAL(10,2) DEFAULT 0.00,
+    moeda VARCHAR(3) DEFAULT 'BRL',
+    
+    -- Identificadores específicos de gateways ou meios
+    transacao_id_gateway VARCHAR(100), -- ID gerado pelo PayPal/PagSeguro/Adquirente
+    
+    -- Dados específicos para Boleto
+    linha_digitavel_boleto TEXT,
+    data_vencimento_boleto DATE,
+    url_boleto TEXT,
+    
+    -- Dados específicos para Cartão de Crédito (nunca armazene o CVV por segurança!)
+    cartao_bandeira VARCHAR(30), -- Ex: Visa, Mastercard
+    cartao_ultimos_digitos VARCHAR(4),
+    parcelas INT DEFAULT 1,
+    
+    data_transacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
+);

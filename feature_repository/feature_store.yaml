@@ -1,0 +1,14 @@
+project: fornecedor_anomalias_proj
+registry: data/registry.db
+provider: local
+offline_store:
+  type: postgres
+  host: localhost
+  port: 5432
+  database: control_platform
+  user: airflow
+  password: airflow_password
+  sslmode: disable
+online_store:
+  type: sqlite
+  path: data/online_store.db

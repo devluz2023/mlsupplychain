@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ml_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow_password
+      POSTGRES_DB: control_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d   # Executa o init-db.sh na primeira criação
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow", "-d", "control_platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ml_models_runner:
+    build: .
+    container_name: controlplatform_ml_runner
+    volumes:
+      - .:/app
+    environment:
+      - FEAST_REPO_PATH=/app/feature_repository
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    command: python /app/ml/autoencoder_fornecedores.py
+    depends_on:
+      - mysql_transacional
+      - mlflow
+    restart: always
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    image: control_platform-mlflow:3.18.0
+    container_name: ml_mlflow
+    ports:
+      - "5001:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=postgresql+psycopg2://airflow:airflow_password@postgres:5432/mlflow_db
+      - MLFLOW_SERVER_ALLOWED_HOSTS=*   # <--- Desativa o bloqueio de Host Header no MLflow v3
+    command: >
+      mlflow server
+      --backend-store-uri postgresql+psycopg2://airflow:airflow_password@postgres:5432/mlflow_db
+      --artifacts-destination /mlflow/artifacts
+      --serve-artifacts
+      --host 0.0.0.0
+      --port 5000
+    volumes:
+      - mlflow_data:/mlflow/artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  airflow:
+    image: apache/airflow:2.8.1-python3.10
+    container_name: ml_airflow
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow_password@postgres:5432/control_platform
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - _PIP_ADDITIONAL_REQUIREMENTS=faker psycopg2-binary pymysql apache-airflow-providers-openlineage
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: standalone
+  # prometheus:
+  #   image: prom/prometheus:v2.51.0
+  #   container_name: ml_prometheus
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - prometheus_data:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: ml_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    # depends_on:
+    #   - prometheus
+
+  mysql_transacional:
+    image: mysql:8.0
+    container_name: controlplatform_mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_password
+      MYSQL_DATABASE: controlplatform_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d   # Carrega automaticamente todos os scripts SQL desta pasta
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pmsql_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  postgres_data:
+  mlflow_data:
+  # prometheus_data:
+  grafana_data:
+  mysql_data:

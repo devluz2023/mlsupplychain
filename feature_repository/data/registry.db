@@ -1,0 +1,45 @@
+
+
+n
+fornecedor_id1ID determinÃ­stico derivado do nome do fornecedor"fornecedor_idJfornecedor_anomalias_proj
+ûŠù×àøÃ·ëåü×è ³…
+P
+0
+__dummy"
+__dummy_idJfornecedor_anomalias_proj
+¹‰ù×ğ”øÄëåü×€Š¸…1"$bc3965ad-8fd8-4d39-ab7f-df3467b52fb2*ëåü×è¨‰2ı
+Ü
+fornecedor_comportamento_fvfornecedor_anomalias_projfornecedor_id"
+total_agendamentos"
+total_cancelados"
+media_dias_atraso"
+total_insumos_reprovados2€ç„:Ševent_timestamp‚W
+U{"name": "fornecedor_comportamento_source", "query": "", "table": "dim_fornecedores"}ŠZfeast.infra.offline_stores.contrib.postgres_offline_store.postgres_source.PostgreSQLSource¢fornecedor_comportamento_source’ëåü×È”|"ëåü×à¼ó„@b
+fornecedor_id’latest
+¹‰ù×àÑ Äëåü×ê²…b§event_timestamp‚W
+U{"name": "fornecedor_comportamento_source", "query": "", "table": "dim_fornecedores"}ŠZfeast.infra.offline_stores.contrib.postgres_offline_store.postgres_source.PostgreSQLSource¢fornecedor_comportamento_sourceªfornecedor_anomalias_proj’¹‰ù×€Ä×"¹‰ù×èğüÂzA
+fornecedor_anomalias_proj$7c48da8d-1202-4cd5-9cd0-8c848648351bŠ;
+
+fornecedor_anomalias_proj
+¹‰ù×¨œ­Ã¹‰ù×¨œ­Ã’í	
+è
+fornecedor_comportamento_fvfornecedor_anomalias_proj"feature_view*ë
+Ê
+fornecedor_comportamento_fvfornecedor_anomalias_projfornecedor_id"
+total_agendamentos"
+total_cancelados"
+media_dias_atraso"
+total_insumos_reprovados2€ç„:‹event_timestamp‚W
+U{"name": "fornecedor_comportamento_source", "query": "", "table": "dim_fornecedores"}ŠZfeast.infra.offline_stores.contrib.postgres_offline_store.postgres_source.PostgreSQLSource¢fornecedor_comportamento_source’¹‰ù×€Ä×"¹‰ù×èğüÂ@’latest
+¹‰ù×àÑ Ä¹‰ù×àÑ Ä2¹‰ù× ‘ôÄB$1315042a-7359-4168-a80a-9de1b5f83a51
+ÿ
+fornecedor_comportamento_fvfornecedor_anomalias_proj"feature_view*€
+İ
+fornecedor_comportamento_fvfornecedor_anomalias_projfornecedor_id"
+total_agendamentos"
+total_cancelados"
+media_dias_atraso"
+total_insumos_reprovados2€ç„:‹event_timestamp‚W
+U{"name": "fornecedor_comportamento_source", "query": "", "table": "dim_fornecedores"}ŠZfeast.infra.offline_stores.contrib.postgres_offline_store.postgres_source.PostgreSQLSource¢fornecedor_comportamento_source’ûŠù×¹¼•"ûŠù× ›€µ@b
+fornecedor_id’latest
+¹‰ù×àÑ ÄûŠù×ˆ¢ªµ 2ûŠù×€³»·B$7000e90f-b0b5-487e-aaa3-f8c1ef51c40e
